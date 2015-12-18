@@ -1,3 +1,13 @@
+" Plugin: https://github.com/brettanomyces/nvim-editcommand
+" Description: Edit command in buffer inside Neovim
+
+if exists('g:loaded_editcommand')
+  finish
+endif
+
+let g:editcommand_loaded = 1
+let g:editcommand_prompt = '> '
+
 " - yank last line with prompt ('> ') into register c
 " - clear commandline
 " - call function
@@ -14,7 +24,8 @@ function! EditCommandline()
   autocmd BufEnter <buffer> put c | autocmd! BufEnter <buffer> | call feedkeys('A')
 
   " get all text after prompt '> '
-  let s:command = strpart(@c, strridx(@c, "> ") + 2)
+  let s:commandstart = strridx(@c, get(g:, 'editcommand_prompt')) + len(get(g:, 'editcommand_prompt'))
+  let s:command = strpart(@c, s:commandstart)
 
   " open new empty buffer
   new 
