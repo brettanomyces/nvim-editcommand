@@ -4,20 +4,13 @@
 if exists('g:loaded_editcommand')
   finish
 endif
-
 let g:editcommand_loaded = 1
-let g:editcommand_prompt = '>'
-" if a user has not entered a command then there will not be a space after the last prompt
-let s:space_or_eol = '\( \|$\)'
 
-" - yank last line with prompt ('> ') into register c
-" - clear commandline
-" - call function
-tnoremap <c-x> <c-\><c-n>
-      \:call SaveRegister()<cr>
-      \:call YankCommand()<cr>
-      \A<c-c><c-\><c-n>
-      \:call EditCommand()<cr>
+" setup default variables if user has not defined any
+let g:editcommand_prompt = get(g:, 'editcommand_prompt', '$')
+let g:editcommand_mapping = get(g:, 'editcommand_mapping', '<c-x><c-e>')
+
+execute printf('tnoremap %s <c-\><c-n>:call SaveRegister()<cr>:call YankCommand()<cr>A<c-c><c-\><c-n>:call EditCommand()<cr>', g:editcommand_mapping)
 
 function! SaveRegister()
   let s:register = @c
@@ -28,7 +21,9 @@ function! RestoreRegister()
 endfunction
 
 function! YankCommand()
-  execute ':?' . g:editcommand_prompt . s:space_or_eol . '?,$y c'
+  " if a user has not entered a command then there will not be a space after the last prompt
+  let l:space_or_eol = '\( \|$\)'
+  execute ':?' . g:editcommand_prompt . l:space_or_eol . '?,$y c'
 endfunction
 
 function! PutCommand()
@@ -47,11 +42,11 @@ function! EditCommand()
         \ startinsert
 
   " command starts after the prompt +1 for a possible space
-  let s:commandstart =
+  let l:commandstart =
         \ strridx(@c, get(g:, 'editcommand_prompt'))
         \ + len(get(g:, 'editcommand_prompt'))
         \ + 1
-  let @c = strpart(@c, s:commandstart)
+  let @c = strpart(@c, l:commandstart)
 
   " open new empty buffer
   new
