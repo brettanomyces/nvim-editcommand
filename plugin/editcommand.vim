@@ -29,8 +29,11 @@ function! EditCommandline()
   " - go to insert mode
   autocmd BufEnter <buffer> put c | autocmd! BufEnter <buffer> | call feedkeys('A')
 
-  " get all text after prompt '> '
-  let s:commandstart = strridx(@c, get(g:, 'editcommand_prompt')) + len(get(g:, 'editcommand_prompt'))
+  " command starts after the prompt +1 for a possible space
+  let s:commandstart =
+        \ strridx(@c, get(g:, 'editcommand_prompt'))
+        \ + len(get(g:, 'editcommand_prompt'))
+        \ + 1
   let s:command = strpart(@c, s:commandstart)
 
   " open new empty buffer
