@@ -6,12 +6,18 @@ if exists('g:loaded_editcommand')
 endif
 
 let g:editcommand_loaded = 1
-let g:editcommand_prompt = '> '
+let g:editcommand_prompt = '>'
+" if a user has not entered a command then there will not be a space after the last prompt
+let s:space_or_eol = '\( \|$\)' 
 
 " - yank last line with prompt ('> ') into register c
 " - clear commandline
 " - call function
-tnoremap <c-x> <c-\><c-n>:execute ':?> ?,$y c'<cr>A<c-c><c-\><c-n>:call EditCommandline()<cr>
+tnoremap <c-x> <c-\><c-n>:call CopyCommand()<cr>A<c-c><c-\><c-n>:call EditCommandline()<cr>
+
+function! CopyCommand()
+  execute ':?' . g:editcommand_prompt . s:space_or_eol . '?,$y c'
+endfunction
 
 function! EditCommandline()
   " clear search highlighting
