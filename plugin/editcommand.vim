@@ -44,7 +44,7 @@ function! EditCommand()
         \ call PutCommand() |
         \ call RestoreRegister() |
         \ autocmd! BufEnter <buffer> |
-        \ call feedkeys('A')
+        \ execute 'normal! A'
 
   " command starts after the prompt +1 for a possible space
   let s:commandstart =
