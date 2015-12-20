@@ -23,11 +23,11 @@ endfunction
 function! YankCommand()
   " if a user has not entered a command then there will not be a space after the last prompt
   let l:space_or_eol = '\( \|$\)'
-  execute ':?' . g:editcommand_prompt . l:space_or_eol . '?,$y c'
+  silent execute ':?' . g:editcommand_prompt . l:space_or_eol . '?,$y c'
 endfunction
 
 function! PutCommand()
-  put! c
+  silent put! c
 endfunction
 
 function! EditCommand()
@@ -57,7 +57,7 @@ function! EditCommand()
   setlocal noswapfile
 
   " put command into buffer
-  put! c
+  silent put! c
 
   " remove extra lines
   %join!
