@@ -20,9 +20,6 @@ function! CopyCommand()
 endfunction
 
 function! EditCommandline()
-  " clear search highlighting
-  let @/ = ""
-
   " - set an autocmd on the current (terminal) buffer that will run when the buffer is next entered
   " - put from register c (where the new command will be)
   " - remove the autocmd
