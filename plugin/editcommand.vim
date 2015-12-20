@@ -14,10 +14,10 @@ let s:space_or_eol = '\( \|$\)'
 " - clear commandline
 " - call function
 tnoremap <c-x> <c-\><c-n>
-      \ :call SaveRegister()<cr>
-      \ :call YankCommand()<cr>
-      \ A<c-c><c-\><c-n>
-      \ :call EditCommand()<cr>
+      \:call SaveRegister()<cr>
+      \:call YankCommand()<cr>
+      \A<c-c><c-\><c-n>
+      \:call EditCommand()<cr>
 
 function! SaveRegister()
   let s:register = @c
