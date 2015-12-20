@@ -44,7 +44,7 @@ function! EditCommand()
         \ call PutCommand() |
         \ call RestoreRegister() |
         \ autocmd! BufEnter <buffer> |
-        \ execute 'normal! A'
+        \ startinsert
 
   " command starts after the prompt +1 for a possible space
   let s:commandstart =
