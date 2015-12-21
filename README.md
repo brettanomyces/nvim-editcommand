@@ -15,10 +15,17 @@ This plugin remaps `<c-x><c-e>` to a function which allows one to edit the curre
 
 ## Configuration
 
-User should set `g:editcommand_prompt` to their shell prompt and `g:editcommand_mapping` to their preferred keys.
+User should set `g:editcommand_prompt` to their shell prompt
 
     let g:editcommand_prompt = '>'       " default is '$'
-    let g:editcommand_mapping = '<c-x>'  " default is '<c-x><c-e>'
+
+The default mapping is `<c-x><c-e>` however you may disable this mapping by setting
+
+    let g:edticommand_no_mappings = 1
+
+To provide you own mapping provide a terminal mapping to `<Plug>EditCommand`
+
+    tmap <c-x> <Plug>EditCommand
 
 ## Notes
 

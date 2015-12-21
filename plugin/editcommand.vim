@@ -6,11 +6,8 @@ if exists('g:loaded_editcommand')
 endif
 let g:editcommand_loaded = 1
 
-" setup default variables if user has not defined any
+" default bash prompt is $ so use that as a default
 let g:editcommand_prompt = get(g:, 'editcommand_prompt', '$')
-let g:editcommand_mapping = get(g:, 'editcommand_mapping', '<c-x><c-e>')
-
-execute printf('tnoremap %s <c-\><c-n>:call <SID>save_register()<cr>:call <SID>yank_command()<cr>A<c-c><c-\><c-n>:call <SID>edit_command()<cr>', g:editcommand_mapping)
 
 function! s:save_register()
   let s:register = @c
@@ -77,3 +74,9 @@ function! s:edit_command()
   autocmd BufLeave <buffer> :silent %yank c
 
 endfunction
+
+tnoremap <silent> <Plug>EditCommand <c-\><c-n>:call <SID>save_register()<cr>:call <SID>yank_command()<cr>A<c-c><c-\><c-n>:call <SID>edit_command()<cr>
+
+if !exists("g:editcommand_no_mappings") || ! g:editcommand_no_mappings
+  tmap <c-x><c-e> <Plug>EditCommand
+endif
