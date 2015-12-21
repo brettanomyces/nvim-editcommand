@@ -59,10 +59,13 @@ function! EditCommand()
   " put command into buffer
   silent put! c
 
-  " remove extra lines
-  %join!
+  " a single line in terminal buffer that wraps is yanked as two lines
+  " so we must join to recombine it. However we do not want to join lines
+  " that end with a '\'. Also removes all the trailing empty lines.
+  vglobal/\\$/join!
+  %left
 
   " copy buffer to register when it is closed
-  autocmd BufLeave <buffer> :%yank c
+  autocmd BufLeave <buffer> :silent %yank c
 
 endfunction
