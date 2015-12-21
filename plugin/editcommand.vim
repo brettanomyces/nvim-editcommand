@@ -20,7 +20,16 @@ endfunction
 function! s:yank_command()
   " if a user has not entered a command then there will not be a space after the last prompt
   let l:space_or_eol = '\( \|$\)'
-  silent execute ':?' . g:editcommand_prompt . l:space_or_eol . '?,$y c'
+
+  " if the last line contains a prompt then yank the last line, else yank from 
+  " the last line contianing a prompt till the last line
+  let l:last = getline('$')
+  if match(l:last, g:editcommand_prompt . l:space_or_eol) !=# -1
+    silent execute '$y c'
+  else
+    silent execute ':?' . g:editcommand_prompt . l:space_or_eol . '?,$y c'
+  endif
+
 endfunction
 
 function! s:put_command()
