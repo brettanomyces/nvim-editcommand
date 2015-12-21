@@ -44,8 +44,8 @@ function! s:edit_command()
   autocmd BufEnter <buffer>
         \ call s:put_command() |
         \ call s:restore_register() |
-        \ autocmd! BufEnter <buffer> |
-        \ startinsert
+        \ startinsert |
+        \ autocmd! BufEnter <buffer>
 
   " command starts after the prompt +1 for a possible space
   let l:commandstart =
@@ -80,7 +80,7 @@ function! s:edit_command()
   silent! %substitute/\\\$/\\\r/g
 
   " copy buffer to register when it is closed
-  autocmd BufLeave <buffer> :silent %yank c
+  autocmd BufLeave <buffer> :silent %yank c | autocmd! BufLeave <buffer>
 
 endfunction
 
