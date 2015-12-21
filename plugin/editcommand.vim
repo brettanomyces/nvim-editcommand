@@ -53,7 +53,7 @@ function! EditCommand()
 
   " make buffer a scratch buffer
   setlocal buftype=nofile
-  setlocal bufhidden=hide
+  setlocal bufhidden=unload
   setlocal noswapfile
 
   " put command into buffer
