@@ -43,7 +43,7 @@ function! EditCommand()
 
   " command starts after the prompt +1 for a possible space
   let l:commandstart =
-        \ strridx(@c, get(g:, 'editcommand_prompt'))
+        \ stridx(@c, get(g:, 'editcommand_prompt'))
         \ + len(get(g:, 'editcommand_prompt'))
         \ + 1
   let @c = strpart(@c, l:commandstart)
