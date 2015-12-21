@@ -10,34 +10,34 @@ let g:editcommand_loaded = 1
 let g:editcommand_prompt = get(g:, 'editcommand_prompt', '$')
 let g:editcommand_mapping = get(g:, 'editcommand_mapping', '<c-x><c-e>')
 
-execute printf('tnoremap %s <c-\><c-n>:call SaveRegister()<cr>:call YankCommand()<cr>A<c-c><c-\><c-n>:call EditCommand()<cr>', g:editcommand_mapping)
+execute printf('tnoremap %s <c-\><c-n>:call <SID>save_register()<cr>:call <SID>yank_command()<cr>A<c-c><c-\><c-n>:call <SID>edit_command()<cr>', g:editcommand_mapping)
 
-function! SaveRegister()
+function! s:save_register()
   let s:register = @c
 endfunction
 
-function! RestoreRegister()
+function! s:restore_register()
   let @c = s:register
 endfunction
 
-function! YankCommand()
+function! s:yank_command()
   " if a user has not entered a command then there will not be a space after the last prompt
   let l:space_or_eol = '\( \|$\)'
   silent execute ':?' . g:editcommand_prompt . l:space_or_eol . '?,$y c'
 endfunction
 
-function! PutCommand()
+function! s:put_command()
   silent put! c
 endfunction
 
-function! EditCommand()
+function! s:edit_command()
   " - set an autocmd on the current (terminal) buffer that will run when the buffer is next entered
   " - put from register c (where the new command will be)
   " - remove the autocmd
   " - go to insert mode
   autocmd BufEnter <buffer>
-        \ call PutCommand() |
-        \ call RestoreRegister() |
+        \ call s:put_command() |
+        \ call s:restore_register() |
         \ autocmd! BufEnter <buffer> |
         \ startinsert
 
