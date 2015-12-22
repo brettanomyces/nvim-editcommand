@@ -30,6 +30,13 @@ function! s:yank_command()
     silent execute ':?' . g:editcommand_prompt . l:space_or_eol . '?,$y c'
   endif
 
+  " command starts after the prompt +1 for a possible space
+  let l:commandstart =
+        \ stridx(@c, get(g:, 'editcommand_prompt'))
+        \ + len(get(g:, 'editcommand_prompt'))
+        \ + 1
+  let @c = strpart(@c, l:commandstart)
+
 endfunction
 
 function! s:put_command()
@@ -46,13 +53,6 @@ function! s:edit_command()
         \ call s:restore_register() |
         \ startinsert |
         \ autocmd! BufEnter <buffer>
-
-  " command starts after the prompt +1 for a possible space
-  let l:commandstart =
-        \ stridx(@c, get(g:, 'editcommand_prompt'))
-        \ + len(get(g:, 'editcommand_prompt'))
-        \ + 1
-  let @c = strpart(@c, l:commandstart)
 
   " open new empty buffer
   new
