@@ -9,15 +9,10 @@ let g:editcommand_loaded = 1
 " default bash prompt is $ so use that as a default
 let g:editcommand_prompt = get(g:, 'editcommand_prompt', '$')
 
-function! s:save_register()
-  let s:register = @c
-endfunction
-
-function! s:restore_register()
-  let @c = s:register
-endfunction
-
 function! s:yank_command()
+  " save current contents of register
+  let l:register = @c
+
   " if a user has not entered a command then there will not be a space after the last prompt
   let l:space_or_eol = '\( \|$\)'
 
@@ -35,25 +30,18 @@ function! s:yank_command()
         \ stridx(@c, get(g:, 'editcommand_prompt'))
         \ + len(get(g:, 'editcommand_prompt'))
         \ + 1
-  let @c = strpart(@c, l:commandstart)
 
+  let s:command = strpart(@c, l:commandstart)
+
+  " restore original contents of register
+  let @c = l:register
 endfunction
 
 function! s:put_command()
-  silent put! c
+  silent put! =s:command
 endfunction
 
-function! s:edit_command()
-  " - set an autocmd on the current (terminal) buffer that will run when the buffer is next entered
-  " - put from register c (where the new command will be)
-  " - remove the autocmd
-  " - go to insert mode
-  autocmd BufEnter <buffer>
-        \ call s:put_command() |
-        \ call s:restore_register() |
-        \ startinsert |
-        \ autocmd! BufEnter <buffer>
-
+function! s:open_scratch_buffer()
   " open new empty buffer
   new
 
@@ -62,9 +50,45 @@ function! s:edit_command()
   setlocal bufhidden=unload
   setlocal noswapfile
 
-  " put command into buffer
-  silent put! c
+  " copy buffer to register when it is closed
+  autocmd BufLeave <buffer> let s:command = join(getline(1, '$'), '\n') | autocmd! BufLeave <buffer>
+endfunction
 
+function! s:open_temporary_file()
+  execute 'new ' . tempname()
+
+  setlocal bufhidden=delete
+  setlocal noswapfile
+
+  " copy buffer to register when it is saved
+  autocmd BufWritePre <buffer> let s:command = join(getline(1, '$'), '\n')
+  autocmd BufLeave <buffer> autocmd! * <buffer>
+
+endfunction
+
+function! s:edit_command()
+  " - set an autocmd on the current (terminal) buffer that will run when the buffer is next entered
+  autocmd BufEnter <buffer>
+        \ call s:put_command() |
+        \ startinsert |
+        \ autocmd! BufEnter <buffer>
+
+  if !exists("g:editcommand_use_temp_file") || ! g:editcommand_use_temp_file
+    call s:open_scratch_buffer()
+  else
+    call s:open_temporary_file()
+  endif
+
+  " put command into buffer
+  silent put! =s:command
+  " clear command
+  let s:command = ''
+
+  call s:format_command()
+
+endfunction
+
+function! s:format_command()
   " push all text to the left
   %left
 
@@ -79,12 +103,9 @@ function! s:edit_command()
 
   silent! %substitute/\\\$/\\\r/g
 
-  " copy buffer to register when it is closed
-  autocmd BufLeave <buffer> :silent %yank c | autocmd! BufLeave <buffer>
-
 endfunction
 
-tnoremap <silent> <Plug>EditCommand <c-\><c-n>:call <SID>save_register()<cr>:call <SID>yank_command()<cr>A<c-c><c-\><c-n>:call <SID>edit_command()<cr>
+tnoremap <silent> <Plug>EditCommand <c-\><c-n>:call <SID>yank_command()<cr>A<c-c><c-\><c-n>:call <SID>edit_command()<cr>
 
 if !exists("g:editcommand_no_mappings") || ! g:editcommand_no_mappings
   tmap <c-x><c-e> <Plug>EditCommand
