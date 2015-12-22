@@ -9,32 +9,29 @@ let g:editcommand_loaded = 1
 " default bash prompt is $ so use that as a default
 let g:editcommand_prompt = get(g:, 'editcommand_prompt', '$')
 
-function! s:yank_command()
-  " save current contents of register
-  let l:register = @c
+function! s:strip_prompt(command)
+  " strip up to and including the first occurence of the prompt
+  let l:prompt_idx = stridx(a:command, get(g:, 'editcommand_prompt')) + len(get(g:, 'editcommand_prompt')) + 1
+  return strpart(a:command, l:prompt_idx)
+endfunction
 
+function! s:extract_command() abort
   " if a user has not entered a command then there will not be a space after the last prompt
   let l:space_or_eol = '\( \|$\)'
 
-  " if the last line contains a prompt then yank the last line, else yank from 
-  " the last line contianing a prompt till the last line
-  let l:last = getline('$')
-  if match(l:last, g:editcommand_prompt . l:space_or_eol) !=# -1
-    silent execute '$y c'
-  else
-    silent execute ':?' . g:editcommand_prompt . l:space_or_eol . '?,$y c'
-  endif
+  " starting at the last line search backwards through the file for a line containing the prompt
+  let l:line_number = line('$')
+  while l:line_number > 0
+    let l:line_number = l:line_number - 1
+    if match(getline(l:line_number), g:editcommand_prompt . l:space_or_eol) !=# -1
+      let s:command = s:strip_prompt(join(getline(l:line_number, '$'), "\n"))
+      break
+    endif
+  endwhile
 
-  " command starts after the prompt +1 for a possible space
-  let l:commandstart =
-        \ stridx(@c, get(g:, 'editcommand_prompt'))
-        \ + len(get(g:, 'editcommand_prompt'))
-        \ + 1
+  " if we reach this point then the prompt was not found
+  echoerr "Could not find prompt '" . g:editcommand_prompt . "' in buffer"
 
-  let s:command = strpart(@c, l:commandstart)
-
-  " restore original contents of register
-  let @c = l:register
 endfunction
 
 function! s:put_command()
@@ -50,8 +47,8 @@ function! s:open_scratch_buffer()
   setlocal bufhidden=unload
   setlocal noswapfile
 
-  " copy buffer to register when it is closed
-  autocmd BufLeave <buffer> let s:command = join(getline(1, '$'), '\n') | autocmd! BufLeave <buffer>
+  " save command when leaving buffer
+  autocmd BufLeave <buffer> let s:command = join(getline(1, '$'), "\n") | autocmd! BufLeave <buffer>
 endfunction
 
 function! s:open_temporary_file()
@@ -60,18 +57,22 @@ function! s:open_temporary_file()
   setlocal bufhidden=delete
   setlocal noswapfile
 
-  " copy buffer to register when it is saved
-  autocmd BufWritePre <buffer> let s:command = join(getline(1, '$'), '\n')
+  " save command when writing buffer
+  autocmd BufWritePre <buffer> let s:command = join(getline(1, '$'), "\n")
   autocmd BufLeave <buffer> autocmd! * <buffer>
 
 endfunction
 
-function! s:edit_command()
-  " - set an autocmd on the current (terminal) buffer that will run when the buffer is next entered
+function! s:set_terminal_autocmd()
+  " set an autocmd on the current (terminal) buffer that will run when the buffer is next entered
   autocmd BufEnter <buffer>
         \ call s:put_command() |
         \ startinsert |
         \ autocmd! BufEnter <buffer>
+
+endfunction
+
+function! s:edit_command()
 
   if !exists("g:editcommand_use_temp_file") || ! g:editcommand_use_temp_file
     call s:open_scratch_buffer()
@@ -89,7 +90,7 @@ function! s:edit_command()
 endfunction
 
 function! s:format_command()
-  " push all text to the left
+  " strip leading whitespace
   %left
 
   " a single line in terminal buffer that wraps is yanked as two lines
@@ -105,7 +106,7 @@ function! s:format_command()
 
 endfunction
 
-tnoremap <silent> <Plug>EditCommand <c-\><c-n>:call <SID>yank_command()<cr>A<c-c><c-\><c-n>:call <SID>edit_command()<cr>
+tnoremap <silent> <Plug>EditCommand <c-\><c-n>:call <SID>extract_command()<cr>A<c-c><c-\><c-n>:call <SID>set_terminal_autocmd()<cr>:call <SID>edit_command()<cr>
 
 if !exists("g:editcommand_no_mappings") || ! g:editcommand_no_mappings
   tmap <c-x><c-e> <Plug>EditCommand
