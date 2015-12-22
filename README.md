@@ -29,9 +29,17 @@ To provide you own mapping provide a terminal mapping to `<Plug>EditCommand`
 
     tmap <c-x> <Plug>EditCommand         " default is <c-x><c-e>
 
+To use a temporary file rather than a scratch buffer set `g:edticommand_use_temp_file`
+
+    let g:edticommand_use_temp_file = 1  " default is 0
+
 ## Notes
 
-The scratch buffer cannot be saved. When the scratch buffer is closed, via `:close` or `:bdelete`, the command in the buffer will be copied to a register. When the terminal buffer is re-entered the command is copied from the register to the commandline and the original contents of the reigster are restored. The autocmd that does this is removed after it executes.
+The scratch buffer cannot be saved, use `:close` or `:bdelete` or `:quit`. 
+
+If using a temporary file the command will only be copied back if you save first `:wquit`.
+
+The command in the buffer will be saved to a script local variable by an autocmd which then removes itself. When the terminal buffer is re-entered the command is copied to the commandline by another autocmd which also removes itself.
 
 ## Feedback
 
