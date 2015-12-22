@@ -1,8 +1,10 @@
 # nvim-editcommand
 
-When running bash inside a terminal one can edit the current command in `$EDITOR` using the shortcut `<c-x><c-e>` (`Ctrl-x``Ctrl-e`). However if your `$EDITOR` is Neovim and you are running bash inside a terminal buffer inside Neovim then this trick does not work.
+Edit your current shell command inside a scratch buffer.
 
-This plugin remaps `<c-x><c-e>` to a function which allows one to edit the current command inside a scratch buffer inside the current Neovim instance. When the scratch buffer is exited and the terminal buffer re-entered, the contents of the scratch buffer are placed on the commandline.
+nvim-editcommand provides similar functionality to `fc` or `<c-x><c-e>`/`Ctrl-x,Ctrl-e`, allowing the user to edit their current shell command in an editor. The reason a user may want to do this is that it allows them to access the editors functionality that may not be available on the command line.
+
+nvim-editcommand would be useful for a Neovim user who is running their shell inside a Neovim terminal buffer. In such a situation `<c-x><c-e>` is still available but (assuming your `$EDITOR` is `nvim`) it will have to open a new Neovim instance inside the terminal inside the existing Neovim instance, which can quickly become rather cumbersome to navigate in and out of.
 
 ##Installation
 
@@ -21,15 +23,15 @@ User should set `g:editcommand_prompt` to their shell prompt
 
 The default mapping is `<c-x><c-e>` however you may disable this mapping by setting
 
-    let g:edticommand_no_mappings = 1
+    let g:edticommand_no_mappings = 1    " default is 0
 
 To provide you own mapping provide a terminal mapping to `<Plug>EditCommand`
 
-    tmap <c-x> <Plug>EditCommand
+    tmap <c-x> <Plug>EditCommand         " default is <c-x><c-e>
 
 ## Notes
 
-It is expected that after editing the command in the scratch buffer the user closes that buffer using `:bdelete`.
+The scratch buffer cannot be saved. When the scratch buffer is closed, via `:close` or `:bdelete`, the command in the buffer will be copied to a register. When the terminal buffer is re-entered the command is copied from the register to the commandline and the original contents of the reigster are restored. The autocmd that does this is removed after it executes.
 
 ## Feedback
 
