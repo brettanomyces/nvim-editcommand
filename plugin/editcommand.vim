@@ -22,11 +22,11 @@ function! s:extract_command() abort
   " starting at the last line search backwards through the file for a line containing the prompt
   let l:line_number = line('$')
   while l:line_number > 0
-    let l:line_number = l:line_number - 1
     if match(getline(l:line_number), g:editcommand_prompt . l:space_or_eol) !=# -1
       let s:command = s:strip_prompt(join(getline(l:line_number, '$'), "\n"))
-      break
+      return
     endif
+    let l:line_number = l:line_number - 1
   endwhile
 
   " if we reach this point then the prompt was not found
