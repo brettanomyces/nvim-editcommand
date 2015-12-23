@@ -1,0 +1,77 @@
+*editcommand.txt* 
+Author: Brettanomyces
+
+
+===============================================================================
+CONTENTS  *editcommand-contents*
+    1. Introduction
+    2. Interface
+      2.1 Variables
+      2.2 Mappings
+    3. Known Issues
+    4. Changelog
+    5. ..
+
+INTRODUCTION *editcommand*
+
+===============================================================================
+INSTALL      *editcommand-install*
+
+Note: editcommand requires Neovim (latest is recommended).
+
+INTERFACE  *editcommand-interface*
+===============================================================================
+
+VARIABLES *editcommand-variables*
+
+                                       *g:editcommand_prompt*
+g:editcommand_prompt
+    A string that editcommand uses to locate the command to edit within the
+    terminal buffer. Should match the end of shell prompt and be as distinct
+    as possible.
+
+    Default value is '$'. This is the default for bash shells.
+
+                                       *g:editcommand_no_mappings*
+g:editcommand_no_mappings
+    Set to 1 to disable the default mapping ('<c-x><c-e>')
+
+    By default this is not defined, which is equivalent to setting it to 0
+
+                                        *g:editcommand_use_temp_file*
+g:editcommand_use_temp_file
+    By default editcommand allows the user to edit the command inside a scratch
+    buffer. Set to 1 to 
+    
+
+
+
+===============================================================================
+MAPPINGS *editcommand-mappings*
+
+===============================================================================
+ISSUES *editcommand-issues*
+
+Multiline commands without forward slashes '\' will be joined on entering the
+edit command buffer. This is necessary because Neovim treats wrapped commands
+on the terminal commandline as seperate lines in NORMAL mode.
+
+Multiline commands that contain the prompt string followed by either a space or
+an end of line, after the first line, will only be partially copied into the
+edit command buffer. This is due to the algothritm for extracting the command from
+the buffer which is as follows:
+
+  #1  Starting from the last line of the file and moving up, find the first line
+  that contains the prompt string followed by a newline or space.
+  #2  Copy the entire lines from the line identified in #1 to the last line of
+  the file into a single string.
+  #3  Remove the prompt from the string by deleting from the start of the string till
+  the character after the prompt
+
+
+
+*EditCommand*
+
+
+
+vim:tw=78:ts=8:ft=help:norl:
