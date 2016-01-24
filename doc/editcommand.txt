@@ -1,6 +1,7 @@
 *editcommand.txt* 
 Author: Brettanomyces
 
+nvim-editcommand 
 
 ===============================================================================
 CONTENTS  *editcommand-contents*
@@ -26,28 +27,46 @@ VARIABLES *editcommand-variables*
 
                                        *g:editcommand_prompt*
 g:editcommand_prompt
+>
+    let g:editcommand_prompt = '>'
+<
     A string that editcommand uses to locate the command to edit within the
     terminal buffer. Should match the end of shell prompt and be as distinct
     as possible.
 
-    Default value is '$'. This is the default for bash shells.
+    Default value is '$' as this is the default for bash.
 
                                        *g:editcommand_no_mappings*
 g:editcommand_no_mappings
+>
+    let g:editcommand_no_mappings = 1
+<
     Set to 1 to disable the default mapping ('<c-x><c-e>')
 
     By default this is not defined, which is equivalent to setting it to 0
 
                                         *g:editcommand_use_temp_file*
 g:editcommand_use_temp_file
+>
+    let g:editcommand_use_temp_file = 1
+<
     By default editcommand allows the user to edit the command inside a scratch
-    buffer. Set to 1 to 
-    
-
-
+    buffer. Set to 1 to use a tmp file instead of a scratch buffer. This may
+    fit a users workflow better than a scratch buffer.
 
 ===============================================================================
 MAPPINGS *editcommand-mappings*
+
+EditCommand
+    Edit the current command.
+>
+    tmap <c-x> <Plug>EditCommand
+<
+    By default '<c-x><c-e>' is mapped to EditCommand in *TERMINAL* mode. This
+    can be disabled by setting |g:editcommand_no_mappings|. 
+
+    Note that *tnoremap* should not be used as your mapping will be remaped
+    internally to the much more complicated command that is actually run.
 
 ===============================================================================
 ISSUES *editcommand-issues*
@@ -56,10 +75,10 @@ Multiline commands without forward slashes '\' will be joined on entering the
 edit command buffer. This is necessary because Neovim treats wrapped commands
 on the terminal commandline as seperate lines in NORMAL mode.
 
-Multiline commands that contain the prompt string followed by either a space or
-an end of line, after the first line, will only be partially copied into the
-edit command buffer. This is due to the algothritm for extracting the command from
-the buffer which is as follows:
+Multiline commands that contain the prompt string followed by either a space
+or an end of line, after the first line of the command, will only be partially
+copied into the edit command buffer. This is due to the algothritm for
+extracting the command from the buffer which is as follows:
 
   #1  Starting from the last line of the file and moving up, find the first line
   that contains the prompt string followed by a newline or space.
@@ -67,6 +86,11 @@ the buffer which is as follows:
   the file into a single string.
   #3  Remove the prompt from the string by deleting from the start of the string till
   the character after the prompt
+
+===============================================================================
+CHANGELOG editcommand-changelog
+
+http://keepachangelog.com
 
 
 
