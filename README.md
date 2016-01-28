@@ -2,7 +2,11 @@
 
 Edit your current shell command inside a scratch buffer.
 
-nvim-editcommand provides similar functionality to `fc` or `<c-x><c-e>`/`Ctrl-x,Ctrl-e`, allowing the user to edit their current shell command in an editor. The reason a user may want to do this is that it allows them to access the editors functionality that may not be available on the command line.
+nvim-editcommand provides similar functionality to `fc` or `<c-x><c-e>`/`Ctrl-x,Ctrl-e`, allowing the user to edit their current shell command in an editor. 
+
+The reason a user may want to do this is that it allows them to access the editors functionality that may not be available on the command line.
+
+It also allows the user to edit command in shell's that may not otherwise provide the same functionality, e.g. `python`/`ruby` interpreters.
 
 nvim-editcommand would be useful for a Neovim user who is running their shell inside a Neovim terminal buffer. In such a situation `<c-x><c-e>` is still available but (assuming your `$EDITOR` is `nvim`) it will have to open a new Neovim instance inside the terminal inside the existing Neovim instance, which can quickly become rather cumbersome to navigate in and out of.
 
