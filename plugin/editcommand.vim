@@ -11,7 +11,10 @@ let g:editcommand_prompt = get(g:, 'editcommand_prompt', '$')
 
 function! s:strip_prompt(command)
   " strip up to and including the first occurence of the prompt
-  let l:prompt_idx = stridx(a:command, get(g:, 'editcommand_prompt')) + len(get(g:, 'editcommand_prompt')) + 1
+  echom 'command: "' . a:command . '"'
+  let l:space_or_eol = '\( \|$\)'
+  let l:prompt_idx = match(a:command, g:editcommand_prompt . l:space_or_eol . '\zs')
+  let l:part = strpart(a:command, l:prompt_idx)
   return strpart(a:command, l:prompt_idx)
 endfunction
 
