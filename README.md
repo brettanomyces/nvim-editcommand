@@ -27,15 +27,15 @@ User should set `g:editcommand_prompt` to their shell prompt
 
 The default mapping is `<c-x><c-e>` however you may disable this mapping by setting
 
-    let g:edticommand_no_mappings = 1    " default is 0
+    let g:editcommand_no_mappings = 1    " default is 0
 
 To provide you own mapping provide a terminal mapping to `<Plug>EditCommand`
 
     tmap <c-x> <Plug>EditCommand         " default is <c-x><c-e>
 
-To use a temporary file rather than a scratch buffer set `g:edticommand_use_temp_file`
+To use a temporary file rather than a scratch buffer set `g:editcommand_use_temp_file`
 
-    let g:edticommand_use_temp_file = 1  " default is 0
+    let g:editcommand_use_temp_file = 1  " default is 0
 
 ## Notes
 
