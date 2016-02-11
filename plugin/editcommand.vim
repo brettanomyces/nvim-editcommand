@@ -10,22 +10,21 @@ let g:editcommand_loaded = 1
 let g:editcommand_prompt = get(g:, 'editcommand_prompt', '$')
 let s:space_or_eol = '\( \|$\|\n\)'
 
-function! s:strip_prompt(command)
+function! s:strip_prompt(commandline)
   " strip up to and including the first occurence of the prompt
-  echom 'command: "' . a:command . '"'
-  let l:prompt_idx = match(a:command, g:editcommand_prompt . s:space_or_eol . '\zs')
-  let l:part = strpart(a:command, l:prompt_idx)
-  return strpart(a:command, l:prompt_idx)
+  let l:prompt_idx = match(a:commandline, g:editcommand_prompt . s:space_or_eol . '\zs')
+  return strpart(a:commandline, l:prompt_idx)
 endfunction
 
 function! s:extract_command() abort
-  " if a user has not entered a command then there will not be a space after the last prompt
-
   " starting at the last line search backwards through the file for a line containing the prompt
   let l:line_number = line('$')
   while l:line_number > 0
     if match(getline(l:line_number), g:editcommand_prompt . s:space_or_eol) !=# -1
-      let s:command = s:strip_prompt(join(getline(l:line_number, '$'), "\n"))
+      let l:commandline = join(getline(l:line_number, '$'), "\n")
+      let l:command = s:strip_prompt(l:commandline)
+      " store command in script local variable
+      let s:command = s:format_command(l:command)
       return
     endif
     let l:line_number = l:line_number - 1
@@ -34,6 +33,16 @@ function! s:extract_command() abort
   " if we reach this point then the prompt was not found
   echoerr "Could not find prompt '" . g:editcommand_prompt . "' in buffer"
 
+endfunction
+
+" remove extra whitespace and newlines caused by our method of extracting text
+" from the terminal buffer
+function! s:format_command(command)
+  " remove all whitespace following a newline
+  let l:command = substitute(a:command, '\(\n\)\s*', '\n', "g")
+  " remove newlines that do not come after a backslash
+  let l:command = substitute(l:command, '\([^\\]\)\n*', '\1', "g")
+  return l:command
 endfunction
 
 function! s:put_command()
@@ -75,7 +84,6 @@ function! s:set_terminal_autocmd()
 endfunction
 
 function! s:edit_command()
-
   if !exists("g:editcommand_use_temp_file") || ! g:editcommand_use_temp_file
     call s:open_scratch_buffer()
   else
@@ -83,29 +91,11 @@ function! s:edit_command()
   endif
 
   " put command into buffer
-  silent put! =s:command
-  " clear command
+  silent put =s:command
+  " remove the (empty) first line
+  0,1delete
+  " clear scirpt local variable
   let s:command = ''
-
-  call s:format_command()
-
-endfunction
-
-function! s:format_command()
-  " strip leading whitespace
-  %left
-
-  " a single line in terminal buffer that wraps is yanked as two lines
-  " so we must join to recombine it. However we do not want to join lines
-  " that end with a '\'.
-
-  " replace backslash followed by newline with \$ so we can see where to add newlines after join
-  silent! %substitute/\\$/\\\$
-
-  %join!
-
-  silent! %substitute/\\\$/\\\r/g
-
 endfunction
 
 tnoremap <silent> <Plug>EditCommand <c-\><c-n>:call <SID>extract_command()<cr>A<c-c><c-\><c-n>:call <SID>set_terminal_autocmd()<cr>:call <SID>edit_command()<cr>
