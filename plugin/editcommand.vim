@@ -4,33 +4,40 @@
 if exists('g:loaded_editcommand')
   finish
 endif
-let g:editcommand_loaded = 1
+let g:editcommand_loaded = 0
 
-" default bash prompt is $ so use that as a default
-let g:editcommand_prompt = get(g:, 'editcommand_prompt', '$')
-
-function! s:strip_prompt(command)
-  " strip up to and including the first occurence of the prompt
-  let l:prompt_idx = stridx(a:command, get(g:, 'editcommand_prompt')) + len(get(g:, 'editcommand_prompt')) + 1
-  return strpart(a:command, l:prompt_idx)
+" Given a string trim from the first character up to and including the
+" character after the prompt. The character after the prompt, if it exists, is
+" expected to be a space. The character after the space will not exist if we
+" are editing an empty command.
+function! s:strip_prompt(commandline, prompt)
+  let l:prompt_idx = stridx(a:commandline, a:prompt) + len(a:prompt) + 1
+  return strpart(a:commandline, l:prompt_idx)
 endfunction
 
+" Extract the command from the current buffer and save it to a script local
+" variable. The command is expected to be after the last occurecne of the
+" prompt and may span multiple lines.
 function! s:extract_command() abort
-  " if a user has not entered a command then there will not be a space after the last prompt
-  let l:space_or_eol = '\( \|$\)'
-
+  " default bash prompt is $ so use that as a default
+  let l:prompt = get(g:, 'editcommand_prompt', '$')
   " starting at the last line search backwards through the file for a line containing the prompt
   let l:line_number = line('$')
   while l:line_number > 0
-    if match(getline(l:line_number), g:editcommand_prompt . l:space_or_eol) !=# -1
-      let s:command = s:strip_prompt(join(getline(l:line_number, '$'), "\n"))
+    " if a user has not entered a command then there will not be a space after the last prompt
+    let l:space_or_eol = '\( \|$\)'
+    if match(getline(l:line_number), l:prompt . l:space_or_eol) !=# -1
+      " combine all the lines from the line containing the prompt to the last line into a single string
+      let l:commandline = join(getline(l:line_number, '$'), "\n")      
+      " save command to a script local variable
+      let s:command = s:strip_prompt(l:commandline, l:prompt)
       return
     endif
     let l:line_number = l:line_number - 1
   endwhile
 
   " if we reach this point then the prompt was not found
-  echoerr "Could not find prompt '" . g:editcommand_prompt . "' in buffer"
+  echoerr "Could not find prompt '" . l:prompt . "' in buffer"
 
 endfunction
 
@@ -106,8 +113,9 @@ function! s:format_command()
 
 endfunction
 
-tnoremap <silent> <Plug>EditCommand <c-\><c-n>:call <SID>extract_command()<cr>A<c-c><c-\><c-n>:call <SID>set_terminal_autocmd()<cr>:call <SID>edit_command()<cr>
+" extract the command, clear the commandline, set up terminal autocmd then edit the command.
+tnoremap <silent> <Plug>EditCommand <c-\><c-n>:call <SID>extract_command()<cr>999@r:call <SID>set_terminal_autocmd()<cr>:call <SID>edit_command()<cr>
 
 if !exists("g:editcommand_no_mappings") || ! g:editcommand_no_mappings
-  tmap <c-x><c-e> <Plug>EditCommand
+  tmap <c-x><c-e> <c-c><Plug>EditCommand
 endif

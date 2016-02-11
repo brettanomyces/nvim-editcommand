@@ -1,0 +1,14 @@
+EditCommand	editcommand.txt	/*EditCommand*
+TERMINAL	editcommand.txt	/*TERMINAL*
+editcommand	editcommand.txt	/*editcommand*
+editcommand-contents	editcommand.txt	/*editcommand-contents*
+editcommand-install	editcommand.txt	/*editcommand-install*
+editcommand-interface	editcommand.txt	/*editcommand-interface*
+editcommand-issues	editcommand.txt	/*editcommand-issues*
+editcommand-mappings	editcommand.txt	/*editcommand-mappings*
+editcommand-variables	editcommand.txt	/*editcommand-variables*
+editcommand.txt	editcommand.txt	/*editcommand.txt*
+g:editcommand_no_mappings	editcommand.txt	/*g:editcommand_no_mappings*
+g:editcommand_prompt	editcommand.txt	/*g:editcommand_prompt*
+g:editcommand_use_temp_file	editcommand.txt	/*g:editcommand_use_temp_file*
+tnoremap	editcommand.txt	/*tnoremap*
