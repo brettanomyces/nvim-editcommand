@@ -8,21 +8,23 @@ let g:editcommand_loaded = 1
 
 " default bash prompt is $ so use that as a default
 let g:editcommand_prompt = get(g:, 'editcommand_prompt', '$')
+let s:space_or_eol = '\( \|$\|\n\)'
 
 function! s:strip_prompt(command)
   " strip up to and including the first occurence of the prompt
-  let l:prompt_idx = stridx(a:command, get(g:, 'editcommand_prompt')) + len(get(g:, 'editcommand_prompt')) + 1
+  echom 'command: "' . a:command . '"'
+  let l:prompt_idx = match(a:command, g:editcommand_prompt . s:space_or_eol . '\zs')
+  let l:part = strpart(a:command, l:prompt_idx)
   return strpart(a:command, l:prompt_idx)
 endfunction
 
 function! s:extract_command() abort
   " if a user has not entered a command then there will not be a space after the last prompt
-  let l:space_or_eol = '\( \|$\)'
 
   " starting at the last line search backwards through the file for a line containing the prompt
   let l:line_number = line('$')
   while l:line_number > 0
-    if match(getline(l:line_number), g:editcommand_prompt . l:space_or_eol) !=# -1
+    if match(getline(l:line_number), g:editcommand_prompt . s:space_or_eol) !=# -1
       let s:command = s:strip_prompt(join(getline(l:line_number, '$'), "\n"))
       return
     endif
