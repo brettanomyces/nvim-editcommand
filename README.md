@@ -14,28 +14,38 @@ nvim-editcommand would be useful for a Neovim user who is running their shell in
 
 ### [vim-plug](https://github.com/junegunn/vim-plug)
 
-    call plug#begin('~/.nvim/plugged')
-    Plug 'brettanomyces/nvim-editcommand'
-    ...
-    call plug#end()
+```vim
+call plug#begin('~/.nvim/plugged')
+Plug 'brettanomyces/nvim-editcommand'
+...
+call plug#end()
+```
 
 ## Configuration
 
 User should set `g:editcommand_prompt` to their shell prompt
 
-    let g:editcommand_prompt = '>'       " default is '$'
+```vim
+let g:editcommand_prompt = '>'       " default is '$'
+```
 
 The default mapping is `<c-x><c-e>` however you may disable this mapping by setting
 
-    let g:editcommand_no_mappings = 1    " default is 0
+```vim
+let g:editcommand_no_mappings = 1    " default is 0
+```
 
 To provide you own mapping provide a terminal mapping to `<Plug>EditCommand`
 
-    tmap <c-x> <Plug>EditCommand         " default is <c-x><c-e>
+```vim
+tmap <c-x> <Plug>EditCommand         " default is <c-x><c-e>
+```
 
 To use a temporary file rather than a scratch buffer set `g:editcommand_use_temp_file`
 
-    let g:editcommand_use_temp_file = 1  " default is 0
+```vim
+let g:editcommand_use_temp_file = 1  " default is 0
+```
 
 ## Notes
 
