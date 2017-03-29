@@ -10,7 +10,7 @@ It also allows the user to edit command in shell's that may not otherwise provid
 
 nvim-editcommand would be useful for a Neovim user who is running their shell inside a Neovim terminal buffer. In such a situation `<c-x><c-e>` is still available but (assuming your `$EDITOR` is `nvim`) it will have to open a new Neovim instance inside the terminal inside the existing Neovim instance, which can quickly become rather cumbersome to navigate in and out of.
 
-##Installation
+## Installation
 
 ### [vim-plug](https://github.com/junegunn/vim-plug)
 
