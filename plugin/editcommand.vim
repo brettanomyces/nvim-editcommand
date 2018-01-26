@@ -24,7 +24,7 @@ function! s:extract_command() abort
       let l:commandline = join(getline(l:line_number, '$'), "\n")
       let l:command = s:strip_prompt(l:commandline)
       " store command in script local variable
-      let s:command = s:format_command(l:command)
+      let g:editcommand_before = s:format_command(l:command)
       return
     endif
     let l:line_number = l:line_number - 1
@@ -46,7 +46,7 @@ function! s:format_command(command)
 endfunction
 
 function! s:put_command()
-  silent put! =s:command
+  silent put! =g:editcommand_after
 endfunction
 
 function! s:open_scratch_buffer()
@@ -59,7 +59,7 @@ function! s:open_scratch_buffer()
   setlocal noswapfile
 
   " save command when leaving buffer
-  autocmd BufLeave <buffer> let s:command = join(getline(1, '$'), "\n") | autocmd! BufLeave <buffer>
+  autocmd BufLeave <buffer> let g:editcommand_after = join(getline(1, '$'), "\n") | autocmd! BufLeave <buffer>
 endfunction
 
 function! s:open_temporary_file()
@@ -69,7 +69,7 @@ function! s:open_temporary_file()
   setlocal noswapfile
 
   " save command when writing buffer
-  autocmd BufWritePre <buffer> let s:command = join(getline(1, '$'), "\n")
+  autocmd BufWritePre <buffer> let g:editcommand_after = join(getline(1, '$'), "\n")
   autocmd BufLeave <buffer> autocmd! * <buffer>
 
 endfunction
@@ -91,11 +91,9 @@ function! s:edit_command()
   endif
 
   " put command into buffer
-  silent put =s:command
+  silent put =g:editcommand_before
   " remove the (empty) first line
   0,1delete
-  " clear scirpt local variable
-  let s:command = ''
 endfunction
 
 tnoremap <silent> <Plug>EditCommand <c-\><c-n>:call <SID>extract_command()<cr>A<c-c><c-\><c-n>:call <SID>set_terminal_autocmd()<cr>:call <SID>edit_command()<cr>
